@@ -1,0 +1,68 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.projections as mp
+taijidian= pd.read_csv(r'D:\1216.csv', index_col='Date', parse_dates= True)
+#yuda= pd.read_csv(r'D:\2330.csv', index_col='Date', parse_dates= True)
+tonyi= pd.read_csv(r'D:\2409.csv', index_col='Date', parse_dates= True)
+changrong= pd.read_csv(r'D:\2412.csv', index_col='Date', parse_dates= True)
+chonghwa= pd.read_csv(r'D:\2618.csv', index_col='Date', parse_dates= True)
+
+portfolio = pd.concat([taijidian, tonyi,changrong, chonghwa],axis=1)
+portfolio.columns= ['2330',  '1216','2616', '2412']
+p = portfolio.head()
+print(p)
+
+mean_daily_ret = portfolio.pct_change(1).mean()
+#print(mean_daily_ret)
+oneyearave= mean_daily_ret*252*1
+print(oneyearave)
+Boeing_mean_daily_ret= taijidian.pct_change(1).mean()
+TWO_YEAR_B_RET =taijidian.pct_change(1).mean()*252*1
+#Chevron_mean_daily_ret= yuda.pct_change(1).mean()
+#TW0_YEAR_C_RET= yuda.pct_change(1).mean()*252*1
+JohnsonJohnson_mean_daily_ret= tonyi.pct_change(1).mean()
+TWO_YEAR_JJ_RET= tonyi.pct_change(1).mean()*252*1
+JPMorganChase_mean_daily_ret= changrong.pct_change(1).mean()
+TWO_TEAR_JP_RET =changrong.pct_change(1).mean()*252*1
+McDonalds_mean_daily_ret= chonghwa.pct_change(1).mean()
+TWO_YEAR_M_RET= chonghwa.pct_change(1).mean()*252*1
+portfolio_one_year_ret= (TWO_YEAR_B_RET+ TWO_YEAR_JJ_RET+ TWO_TEAR_JP_RET+TWO_YEAR_M_RET)/5
+#print("ave_return_of_portfolio=")
+print(portfolio_one_year_ret)
+#corr =portfolio.pct_change(1).corr()
+#print(pd.DataFrame(corr))
+#print(corr)
+
+portfolio_normed = portfolio/portfolio.iloc[0]
+portfolio_daily_ret = portfolio.pct_change(1)
+portfolio_daily_ret.head()
+log_re = np.log(portfolio/portfolio.shift(1))
+k =log_re.head()
+one_year_return= log_re*252*1
+print("oneyearreturn=")
+print(one_year_return)
+#log_re.hist(bins=100, figsize=(12,8))
+#log_re.describe().transpose()
+#log_re.mean()*252
+#log_re.cov()
+#log_re.cov()*252
+
+print("average_return=", portfolio_one_year_ret*100/252*1)
+print('initial_amount=700000')
+print('at_maturity=',700000*(1+portfolio_one_year_ret))
+
+#隨機執行20000次
+num_times = 20000
+all_weights = np.zeros((num_times, len(portfolio.columns)))
+re_arr = np.zeros(num_times)
+vol_arr = np.zeros(num_times)
+df = pd.DataFrame(vol_arr)
+df.dropna()
+sharpe_arr = np.zeros(num_times)
+   
+plt.figure(figsize=(8,4))
+plt.scatter(vol_arr,re_arr, c=sharpe_arr, cmap='viridis')
+plt.xlabel('Volatility')
+plt.ylabel('Return')
+plt.show()
