@@ -1,0 +1,140 @@
+import numpy as np
+import csv  
+import pandas as pd
+from datetime import datetime
+import matplotlib.dates as mdates
+import matplotlib.ticker as mtick  
+from matplotlib.font_manager import FontProperties
+import matplotlib.pyplot as plt
+
+OptionPV= pd.read_csv(r"C:\Users\vicky\Desktop\traderoom\OptionPV.csv")
+Delta=pd.read_csv(r"C:\Users\vicky\Desktop\traderoom\Delta.csv")
+PV=pd.read_csv(r"C:\Users\vicky\Desktop\traderoom\PV.csv")
+stress=pd.read_csv(r"C:\Users\vicky\Desktop\traderoom\stress.csv")
+stress2=pd.read_csv(r'C:\Users\vicky\Desktop\traderoom\stress2.csv')
+volitility=pd.read_csv(r"C:\Users\vicky\Desktop\traderoom\volitility.csv")
+plt.style.use('ggplot')  
+plt.style.use('classic')  
+
+import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.ticker as mtick  
+from matplotlib.font_manager import FontProperties
+#font = FontProperties(fname=r"c:\windows\fonts\simsun.ttc", size=14)
+c=stress2["Bloomberg PV"]
+
+a=stress2["Calibration Error - RMSE (b.p.)"]  #DATA
+b=stress2["PV"]
+l=[i for i in range(10)]
+
+plt.rcParams['font.sans-serif']=['SimHei'] 
+
+fmt='%.2f%%'
+yticks = mtick.FormatStrFormatter(fmt)  
+lx=stress2["Unnamed: 0"]
+
+fig = plt.figure()  
+plt.xticks(rotation=45) 
+ax1 = fig.add_subplot(111)  
+ax1.plot(l, b,'or-',label=u'PV');
+ax1.yaxis.set_major_formatter(yticks)
+ax3 = fig.add_subplot(111)
+ax3.plot(l, c,'o-',label=u'Bloomberg PV');
+ax3.yaxis.set_major_formatter(yticks)
+#for i,(_x,_y) in enumerate(zip(l,b)):
+#plt.text(_x,_y,b[i],color='black',fontsize=10,)  #標出刻度
+ax1.legend(loc=1)
+ax1.set_ylim([-300000, -50000]);
+ax1.set_ylabel('PV',fontsize = 15, fontweight = "bold");
+plt.legend(prop={'family':'SimHei','size':12})  
+ax2 = ax1.twinx() # this is the important function  
+plt.bar(l,a,alpha=0.3,color='blue',label=u'ERROR RATE',align='center',width=0.8)  
+ax2.legend(loc=2)
+
+ax2.set_ylim([0, 0.0003])  #y range
+ax2.set_ylabel('ERROR RATE',fontsize = 15, fontweight = "bold");
+plt.legend(prop={'family':'SimHei','size':12},loc="upper left") 
+
+plt.xticks(l,lx)
+plt.title("Stress Test 2", fontsize = 15, fontweight = "bold", y = 1.1) 
+#plt.show()
+
+c=stress["Bloomberg PV"]
+a=stress["Calibration Error - RMSE (b.p.)"]  #DATA
+b=stress["PV"]
+l=[i for i in range(10)]
+
+plt.rcParams['font.sans-serif']=['SimHei'] 
+
+#fmt='%.2f%%'
+#yticks = mtick.FormatStrFormatter(fmt)  
+lx=stress2["Unnamed: 0"]
+
+fig = plt.figure()  
+plt.xticks(rotation=45) 
+ax1 = fig.add_subplot(111)  
+ax1.plot(l, b,'or-',label=u'PV');
+ax1.yaxis.set_major_formatter(yticks)
+ax3 = fig.add_subplot(111)
+ax3.plot(l, c,'o-',label=u'Bloomberg PV');
+ax3.yaxis.set_major_formatter(yticks)
+#for i,(_x,_y) in enumerate(zip(l,b)):  
+ #   plt.text(_x,_y,b[i],color='black',fontsize=10,)  #標出刻度
+ax1.legend(loc=1)
+ax1.set_ylim([-800000, -100000]);
+ax1.set_ylabel('PV',fontsize = 15, fontweight = "bold");
+plt.legend(prop={'family':'SimHei','size':12})  
+ax2 = ax1.twinx() # this is the important function  
+plt.bar(l,a,alpha=0.3,color='blue',label=u'ERROR RATE',align='center',width=0.8)  
+ax2.legend(loc=2)
+
+ax2.set_ylim([0, 0.0004])  
+ax2.set_ylabel('ERROR RATE',fontsize = 15, fontweight = "bold");
+plt.legend(prop={'family':'SimHei','size':12},loc="upper left") 
+
+plt.xticks(l,lx)
+plt.title("Stress Test ", fontsize = 15, fontweight = "bold", y = 1.1) 
+plt.show()
+
+
+plt.plot(volitility["volatilities1"],c = "r")  
+plt.plot(volitility["volatilities2"],"g")
+# 設定圖例，參數為標籤、位置
+plt.legend(labels=["volatilities1", "volatilities2"], loc = 'best')
+plt.xlabel("Variables", fontweight = "bold")             
+y_ticks = np.arange(-1, 1, 0.05)
+plt.ylabel("Value", fontweight = "bold")  
+plt.title("Valitility", fontsize = 15, fontweight = "bold", y = 1.1) 
+plt.xticks(rotation=0)   
+plt.show()
+
+objects = Delta["Time"]
+y_pos = np.arange(len(objects))
+performance = Delta["Delta"]
+
+plt.bar(y_pos, performance, align='edge',width=0.8, alpha=0.6) #or center
+plt.xticks(y_pos, objects)
+plt.xticks(rotation=45)
+plt.ylabel('Delta',fontweight = "bold")
+plt.title('Delta',fontsize = 15, fontweight = "bold", y = 1.1)
+plt.legend(labels=["Delta"], loc = 'best')
+plt.show()
+
+y1 = PV["PV"]
+y2 = PV["Lower Bound (%)"]
+plt.plot(y2,y1)
+plt.legend(labels=["Present Value"], loc = 'best')
+plt.xlabel("Lower Bond (%)", fontweight = "bold")              
+plt.ylabel("Value", fontweight = "bold")   
+plt.title("Present Value", fontsize = 15, fontweight = "bold", y = 1.1)   
+plt.xticks(rotation=0)   
+
+
+X1 = OptionPV["Option PV"]
+X2 = OptionPV["Lower Bound (%)"]
+plt.plot(X2,X1)
+plt.legend(labels=["Option Present Value",'PV'], loc = 'best')
+plt.xlabel("Lower Bond (%)", fontweight = "bold")                
+plt.ylabel("Value", fontweight = "bold")   
+plt.title("Option Present Value", fontsize = 15, fontweight = "bold", y = 1.1)   
+plt.xticks(rotation=0)   
