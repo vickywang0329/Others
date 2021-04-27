@@ -30,8 +30,10 @@ TWO_YEAR_M_RET= chonghwa.pct_change(1).mean()*252*1
 portfolio_one_year_ret= (TWO_YEAR_B_RET+ TWO_YEAR_JJ_RET+ TWO_TEAR_JP_RET+TWO_YEAR_M_RET)/5
 #print("ave_return_of_portfolio=")
 print(portfolio_one_year_ret)
-#corr =portfolio.pct_change(1).corr()
-#print(pd.DataFrame(corr))
+corr =portfolio.pct_change(1).corr()
+pd.set_option('display.max_rows', 1000)
+pd.set_option('display.max_column',1000)
+print(pd.DataFrame(corr))
 #print(corr)
 
 portfolio_normed = portfolio/portfolio.iloc[0]
