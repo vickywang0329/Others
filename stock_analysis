@@ -1,0 +1,111 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import pandas_datareader.data as web
+import datetime as dt
+start = dt.datetime(2014, 4, 1)
+end = dt.datetime(2021, 1, 31)
+fb = web.DataReader('FB', 'stooq', start, end)
+print(fb.head())
+fb.index = pd.to_datetime(fb.index)
+aapl= web.DataReader('AAPL', 'stooq', start, end)
+aapl.index = pd.to_datetime(aapl.index)
+print(aapl.head())
+'''
+import requests
+date =[20200201]
+stockNo = 2330
+url_template= 'https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=html&date={}&stockNo={}'
+for date in date:
+	url= url_template.format(date, stockNo)
+	file_name= "{}_{}.csv".format(stockNo, date)
+	data = pd.read_html(requests.get(url).text)[0]
+	data.to_csv(file_name, index=False)
+	'''
+tsmc = pd.read_csv('D:\\2330_history.csv')
+pd.set_option('max_rows', 1000)
+pd.set_option('max_columns', 100)
+print(tsmc.head())
+tsmc.index = pd.to_datetime(tsmc.index)
+
+aapl['Open'].plot(label='Apple')
+fb['Open'].plot(label='Facebook')
+tsmc['Open'].plot(label='tsmc')
+plt.legend()
+#plt.show()
+
+aapl['Volume'].plot(label='Apple')
+fb['Volume'].plot(label='Facebook')
+tsmc['Volume'].plot(label='TSMC')
+plt.legend()
+#plt.show()
+print(fb['Volume'].idxmax())
+
+aapl['Total Traded']= aapl['Open']*aapl['Volume']
+fb['Total Traded'] = fb['Open']*fb['Volume']
+tsmc['Total Traded'] = tsmc['Open']*tsmc['Volume']
+aapl['Total Traded'].plot(label='Apple')
+fb['Total Traded'].plot(label='Facebook')
+tsmc['Total Traded'].plot(label='TSMC')
+plt.legend()
+plt.ylabel('Total Traded')
+#plt.show()
+aapl['Total Traded'].idxmax()
+#繪製移動平均線
+aapl['ma50']= aapl['Open'].rolling(50).mean()
+aapl['ma200'] = aapl['Open'].rolling(200).mean()
+aapl[['Open', 'ma50', 'ma200']].plot(label='Apple', figsize=(16, 8))
+#plt.show()
+
+#看看這些股票是否存在關係，通過散點矩陣圖看
+from pandas.plotting import scatter_matrix
+tech_comp = pd.concat([aapl['Open'], fb['Open'], tsmc['Open']], axis=1)
+tech_comp.columns=['tsmc Open', 'Apple Open', 'Facebook Open']
+scatter_matrix(tech_comp, figsize=(8,8), alpha=0.2, hist_kwds={'bins':50})
+#plt.show()
+
+#財務分析
+aapl['Returns']= (aapl['Close']/aapl['Close'].shift(1))-1
+print(aapl.head())
+#或是
+aapl['Returns'] = aapl['Close'].pct_change(1)
+print(aapl.head())
+fb['Returns'] = (fb['Close']/fb['Close'].shift(1))-1
+tsmc['Returns'] = (tsmc['Close']/tsmc['Close'].shift(1))-1
+print(fb.head())
+print(tsmc.head())
+fb['Returns'].hist(bins=50)
+#將他們疊加在一起，哪個股票波動性最大
+aapl['Returns'].plot(kind='hist',bins=100, label='Apple', figsize=(10,8))
+fb['Returns'].plot(kind='hist',bins=100, label='Facebook')
+tsmc['Returns'].plot(kind='hist',bins=100, label='TSMC')
+plt.legend()
+plt.show()
+#繪製KDE做為參考
+tsmc['Returns'].plot(kind='kde',label='TSMC',figsize=(12,6))
+aapl['Returns'].plot(kind='kde',label='Apple')
+fb['Returns'].plot(kind='kde',label='Facebook')
+plt.legend()
+plt.show()
+#創建比較回報的箱型圖
+box_df = pd.concat([aapl['Returns'], fb['Returns'], tsmc['Returns']], axis=1)
+box_df.columns= ['Apple Returns', 'Facebook Returns', 'TSMC, Returns']
+box_df.plot(kind='box', figsize=(8,11), colormap='jet')
+#plt.show()
+#比較股票之間的每日回報，查看每個股票每日回報之間的相聯性，有助於回答科技公司的問題:Facebook
+#是否更被市場視為網路公司而不是科技公司?
+scatter_matrix(box_df,figsize=(8,8),alpha=0.2,hist_kwds={'bins':50})
+#plt.show()
+box_df.plot(kind='scatter', x='Facebook Returns', y='Apple Returns', alpha=0.4, figsize=(10,8))
+#plt.show()
+#現在我們可以看哪個股票的日收益最大。隨著每日累積回報，如果我在時間序列開始時在公司投資1美元，今天的價值多少?
+#不考慮回報股息的股票
+aapl['cumulative return'] = (1+aapl['Returns']).cumprod()
+print(aapl.head())
+fb['cumulative return']= (1+fb['Returns']).cumprod()
+tsmc['cumulative return']= (1+tsmc['Returns']).cumprod()
+aapl['cumulative return'].plot(label='Apple', figsize=(16,8), title= 'cumulative return')
+fb['cumulative return'].plot(label='Facebook')
+tsmc['cumulative return'].plot(label='TSMC')
+plt.legend()
+#plt.show()
